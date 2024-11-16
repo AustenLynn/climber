@@ -1,7 +1,9 @@
-
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'TimerButton.dart';
 import 'theme/Colors.dart';
+import 'CircularSlider.dart';
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -9,10 +11,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   double timeValue = 0;
+  Timer? timer;
+  int seconds = 0;
 
   void updateTimeValue(double newValue) {
     setState(() {
       timeValue = newValue;
+      seconds = (timeValue.floor() * 60); // Converts to total seconds
+    });
+  }
+
+  void startTimer() {
+    if (timer != null && timer!.isActive) return; // Prevent multiple timers
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
+      if (seconds > 0) {
+        setState(() {
+          seconds--;
+        });
+      } else {
+        timer?.cancel(); // Stop the timer when it reaches zero
+      }
     });
   }
 
@@ -21,100 +39,72 @@ class _HomeScreenState extends State<HomeScreen> {
     return '${minCount.floor()}:00';
   }
 
+  String formatSeconds(int seconds) {
+    final int minutes = seconds ~/ 60;
+    final int remainingSeconds = seconds % 60;
+    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Stack(
+      body: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Positioned(
-                  child: GestureDetector(
-                    onTap: () {
-                      print("Image button inside circular slider tapped!");
-                      // You can perform other actions here as well
-                    },
-                    child: ClipOval(
-                      child:
-                      Image.asset(
-                        'assets/my_mountain.png', // Replace with your image asset path
-                        width: 250, // Adjust the size as needed
-                        height: 250,
-                        fit: BoxFit.cover,
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        print("Image button inside circular slider tapped!");
+                      },
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/my_mountain.png',
+                          width: 250,
+                          height: 250,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-
                     ),
-                  ),
-                ),
-                CircularSlider(
-                  onChanged: updateTimeValue,
+                    CircularSlider(
+                      onChanged: updateTimeValue,
+                    ),
+                  ],
                 ),
               ],
-             ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            ),
+            SizedBox(
+              height: 20,
+            ),
             Text(
-              displayTimeValue(timeValue),
-              style: TextStyle(fontSize: 48,
-              color: AppColors.textColor,
+              formatSeconds(seconds),
+              style: const TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textColor,
               ),
-            )
-            ]
-          )
-
-        ],
+            ),
+            SizedBox(height: 20),
+            TimerButton(
+              onClicked: startTimer,
+            ),
+          ],
+        ),
       ),
     );
   }
-
-}
-
-class CircularSlider extends StatelessWidget {
-  final Function(double) onChanged;
-
-  const CircularSlider({Key? key, required this.onChanged}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return SleekCircularSlider(
-      initialValue: 0,
-      max: 36,
-      appearance: CircularSliderAppearance(
-        customColors: CustomSliderColors(
-          progressBarColors: [Colors.red],
-          trackColor: AppColors.secondaryColor,
-          shadowColor: AppColors.accentColor,
-          shadowMaxOpacity: 0.5,
-        ),
-        customWidths: CustomSliderWidths(
-          progressBarWidth: 24,
-          trackWidth: 24,
-          shadowWidth: 20,
-        ),
-        size: 250,
-        startAngle: 270,
-        angleRange: 360,
-        infoProperties: InfoProperties(
-          mainLabelStyle: TextStyle(fontSize: 24, color: Colors.blue),
-          modifier: (double value) {
-            return '${value.toStringAsFixed(0)}%';
-          },
-        ),
-        spinnerMode: false,
-        animationEnabled: true,
-      ),
-      onChange: (double value) {
-        onChanged(value);  // Update the parent widget's state with the new value
-      },
-    );
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 }
+
