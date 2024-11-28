@@ -25,14 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
-  circular_countdown_timer:
-    dependency: "direct main"
-    description:
-      name: circular_countdown_timer
-      sha256: "608d166c8c659af5740ffec8859e1429a4849b706675a529dc381ef40784697b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.4"
   clock:
     dependency: transitive
     description:
@@ -75,6 +67,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.19.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -144,14 +144,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
-  sleek_circular_slider:
-    dependency: "direct main"
-    description:
-      name: sleek_circular_slider
-      sha256: "8844d036269a13e60dda4e16534d30d27cacaff8d2f10d042d9d61d111468b13"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   source_span:
     dependency: transitive
     description:
@@ -184,6 +176,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  syncfusion_flutter_core:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_core
+      sha256: a39ddfb22b30c7cba620fec7dc682e46f151998febd25bca5519c17431084951
+      url: "https://pub.dev"
+    source: hosted
+    version: "27.2.3"
+  syncfusion_flutter_gauges:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_gauges
+      sha256: f9f25f956dd546e86cc0552cda87cc04543634505913881e9b60388c2924aa44
+      url: "https://pub.dev"
+    source: hosted
+    version: "27.2.3"
   term_glyph:
     dependency: transitive
     description:

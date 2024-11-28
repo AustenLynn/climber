@@ -17,26 +17,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void updateTimeValue(double newValue) {
     setState(() {
       timeValue = newValue;
-      seconds = (timeValue.floor() * 60); // Converts to total seconds
+      seconds = (timeValue.floor() * 5 * 60);
     });
   }
 
   void startTimer() {
-    if (timer != null && timer!.isActive) return; // Prevent multiple timers
-    timer = Timer.periodic(Duration(seconds: 1), (_) {
+    if (timer != null && timer!.isActive) return;
+    timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (seconds > 0) {
         setState(() {
           seconds--;
         });
       } else {
-        timer?.cancel(); // Stop the timer when it reaches zero
+        timer?.cancel();
+        // RegisterTimer()
       }
     });
-  }
-
-  String displayTimeValue(double timeValue) {
-    double minCount = timeValue.floor() * 5;
-    return '${minCount.floor()}:00';
   }
 
   String formatSeconds(int seconds) {
@@ -47,57 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
       backgroundColor: AppColors.primaryColor,
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        print("Image button inside circular slider tapped!");
-                      },
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/my_mountain.png',
-                          width: 250,
-                          height: 250,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    CircularSlider(
-                      onChanged: updateTimeValue,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              formatSeconds(seconds),
-              style: const TextStyle(
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textColor,
-              ),
-            ),
-            SizedBox(height: 20),
-            TimerButton(
-              onClicked: startTimer,
-            ),
-          ],
-        ),
-      ),
+      body: _buildHomeScreen(),
+      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -106,5 +55,153 @@ class _HomeScreenState extends State<HomeScreen> {
     timer?.cancel();
     super.dispose();
   }
+
+  Widget _buildBottomNavigationBar(){
+    return BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.av_timer),
+            label: 'Timer',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.checklist),
+            label: 'To-Do',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.insights),
+            label: 'Insights',
+          ),
+        ],
+    );
+  }
+  Widget _buildHomeScreen(){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height:400,
+            child: Container(
+              color: Colors.red,
+              child: Stack(
+                children: [
+                  CircularSlider(onChanged: updateTimeValue, pointerValue: timeValue)
+                ]
+              )
+              ,
+            ),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height:200,
+            child: Container(
+              color: Colors.blue,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+                    child: Text(
+                      formatSeconds(seconds),
+                      style: const TextStyle(
+                        fontSize: 48,
+                        color:AppColors.accentColor,
+                      ) ,
+                    ),
+                  ),
+                  TimerButton(onClicked: startTimer)
+                ],
+              ),
+            ),
+          ),
+
+        ],
+      );
+  }
 }
 
+/*
+Stack(
+alignment: Alignment.center,
+children: [
+GestureDetector(
+onTap: () {
+print("Image button inside circular slider tapped!");
+},
+child: ClipOval(
+child: Image.asset(
+'assets/my_mountain.png',
+width: 250,
+height: 250,
+fit: BoxFit.cover,
+),
+),
+),
+CircularSlider(
+onChanged: updateTimeValue,
+),
+],
+),
+],
+),
+*/
+
+/*
+SizedBox(
+width: MediaQuery.of(context).size.width,
+child: Column(
+mainAxisAlignment: MainAxisAlignment.center,
+children: [
+Row(
+mainAxisAlignment: MainAxisAlignment.center,
+children: [
+Stack(
+alignment: Alignment.center,
+children: [
+GestureDetector(
+onTap: () {
+print("Image button inside circular slider tapped!");
+},
+child: ClipOval(
+child: Image.asset(
+'assets/my_mountain.png',
+width: 250,
+height: 250,
+fit: BoxFit.cover,
+),
+),
+),
+CircularSlider(
+onChanged: updateTimeValue,
+),
+],
+),
+],
+),
+Row(
+mainAxisAlignment: MainAxisAlignment.center,
+children: [
+
+SizedBox(
+width: 100,
+height: 100,
+child: Text(
+formatSeconds(seconds),
+style: const TextStyle(
+fontSize: 48,
+fontWeight: FontWeight.bold,
+color: AppColors.textColor,
+),
+),
+),
+TimerButton(
+onClicked: startTimer,
+),
+],
+),
+
+],
+),
+),
+);
+*/

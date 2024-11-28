@@ -30,8 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  circular_countdown_timer: ^0.2.4
-  sleek_circular_slider: ^2.0.1
+  syncfusion_flutter_gauges: ^27.2.3
 
 
 
