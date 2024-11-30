@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class InsightsScreen extends StatefulWidget {
@@ -10,6 +11,6 @@ class InsightsScreen extends StatefulWidget {
 class _InsightsScreenState extends State<InsightsScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Insights Screen'));
+    return const Center(child: Text('Task List Screen'));
   }
 }

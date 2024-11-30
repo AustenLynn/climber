@@ -26,7 +26,6 @@ class HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-
   Widget _buildHomeScreen(){
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,

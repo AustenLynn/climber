@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Screens/home_screen.dart';
 import 'Screens/insights_screen.dart';
-import 'Screens/task_list_screen.dart';
+import 'Screens/to_do_screen.dart';
 
 class ScreenManager extends StatefulWidget {
   const ScreenManager({super.key});
@@ -17,8 +17,9 @@ class _ScreenManagerState extends State<ScreenManager> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    TaskListScreen(),
+    TodoScreen(),
     InsightsScreen(),
+
   ];
 
   @override
