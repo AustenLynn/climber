@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'theme/Colors.dart';
 
 
 class CircularSlider extends StatelessWidget {
   final Function(double) onChanged;
   final double pointerValue;
 
-  CircularSlider({super.key, required this.onChanged, required this.pointerValue});
+  const CircularSlider({super.key, required this.onChanged, required this.pointerValue});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class CircularSlider extends StatelessWidget {
                 enableDragging: true,
                 markerWidth: 30,
                 markerHeight: 30,
-                color: AppColors.secondaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 markerType: MarkerType.circle,
                 onValueChanged: onChanged,
               ),

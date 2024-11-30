@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'TimerButton.dart';
-import 'theme/Colors.dart';
-import 'CircularSlider.dart';
+import '../widgets/timer_button.dart';
+import '../widgets/circular_slider.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   double timeValue = 0;
   Timer? timer;
   int seconds = 0;
@@ -44,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: _buildHomeScreen(),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.insights),
-            label: 'Insightss',
+            label: 'Insights',
           ),
         ],
     );
@@ -87,8 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   CircularSlider(onChanged: updateTimeValue, pointerValue: timeValue)
                 ]
-              )
-              ,
+              ),
             ),
           ),
           SizedBox(
@@ -103,9 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
                     child: Text(
                       formatSeconds(seconds),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 48,
-                        color:AppColors.accentColor,
+                        color: Theme.of(context).colorScheme.surface,
                       ) ,
                     ),
                   ),
@@ -120,88 +120,3 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/*
-Stack(
-alignment: Alignment.center,
-children: [
-GestureDetector(
-onTap: () {
-print("Image button inside circular slider tapped!");
-},
-child: ClipOval(
-child: Image.asset(
-'assets/my_mountain.png',
-width: 250,
-height: 250,
-fit: BoxFit.cover,
-),
-),
-),
-CircularSlider(
-onChanged: updateTimeValue,
-),
-],
-),
-],
-),
-*/
-
-/*
-SizedBox(
-width: MediaQuery.of(context).size.width,
-child: Column(
-mainAxisAlignment: MainAxisAlignment.center,
-children: [
-Row(
-mainAxisAlignment: MainAxisAlignment.center,
-children: [
-Stack(
-alignment: Alignment.center,
-children: [
-GestureDetector(
-onTap: () {
-print("Image button inside circular slider tapped!");
-},
-child: ClipOval(
-child: Image.asset(
-'assets/my_mountain.png',
-width: 250,
-height: 250,
-fit: BoxFit.cover,
-),
-),
-),
-CircularSlider(
-onChanged: updateTimeValue,
-),
-],
-),
-],
-),
-Row(
-mainAxisAlignment: MainAxisAlignment.center,
-children: [
-
-SizedBox(
-width: 100,
-height: 100,
-child: Text(
-formatSeconds(seconds),
-style: const TextStyle(
-fontSize: 48,
-fontWeight: FontWeight.bold,
-color: AppColors.textColor,
-),
-),
-),
-TimerButton(
-onClicked: startTimer,
-),
-],
-),
-
-],
-),
-),
-);
-*/

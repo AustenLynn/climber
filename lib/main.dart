@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'Climber.dart';
+import 'material_app.dart';
 
 void main() {
-  runApp(Climber());
+  runApp(const Climber());
 }
 

@@ -1,6 +1,6 @@
 
-import 'package:climber/theme/Colors.dart';
 import 'package:flutter/material.dart';
+
 
 class TimerButton extends StatelessWidget {
   final VoidCallback onClicked;
@@ -11,7 +11,7 @@ class TimerButton extends StatelessWidget {
     onPressed: onClicked,
     child: const Text(
       "Start timer",
-      style: TextStyle(color: AppColors.textColor),
+      style: TextStyle(),
     ),
   );
 }
