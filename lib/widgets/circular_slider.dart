@@ -10,34 +10,32 @@ class CircularSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: SfRadialGauge(
-        axes: <RadialAxis>[
-          RadialAxis(
-            minimum: 0,
-            maximum: 36,
-            startAngle: 270,
-            endAngle: 270,
-            pointers: <GaugePointer>[
-              MarkerPointer(
-                value: pointerValue,
-                enableDragging: true,
-                markerWidth: 30,
-                markerHeight: 30,
-                color: Theme.of(context).colorScheme.primary,
-                markerType: MarkerType.circle,
-                onValueChanged: onChanged,
-              ),
-            ],
-            ranges: <GaugeRange>[
-              GaugeRange(
-                startValue:0,
-                endValue: pointerValue)],
-            showTicks: false,
-            showLabels: false,
-          ),
-        ],
-      ),
+    return SfRadialGauge(
+      axes: <RadialAxis>[
+        RadialAxis(
+          minimum: 0,
+          maximum: 36,
+          startAngle: 270,
+          endAngle: 270,
+          pointers: <GaugePointer>[
+            MarkerPointer(
+              value: pointerValue,
+              enableDragging: true,
+              markerWidth: 30,
+              markerHeight: 30,
+              color: Theme.of(context).colorScheme.primary,
+              markerType: MarkerType.circle,
+              onValueChanged: onChanged,
+            ),
+          ],
+          ranges: <GaugeRange>[
+            GaugeRange(
+              startValue:0,
+              endValue: pointerValue)],
+          showTicks: false,
+          showLabels: false,
+        ),
+      ],
     );
   }
 }
