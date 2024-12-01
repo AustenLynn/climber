@@ -11,12 +11,19 @@ class CircularSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SfRadialGauge(
+
       axes: <RadialAxis>[
         RadialAxis(
+
           minimum: 0,
           maximum: 36,
           startAngle: 270,
           endAngle: 270,
+          radiusFactor: 1.002,
+          axisLineStyle: AxisLineStyle(
+            thickness: 32, // Increase this value to make the axis thicker
+            color: Theme.of(context).colorScheme.secondary, // Optional: change axis color
+          ),
           pointers: <GaugePointer>[
             MarkerPointer(
               value: pointerValue,
@@ -30,6 +37,9 @@ class CircularSlider extends StatelessWidget {
           ],
           ranges: <GaugeRange>[
             GaugeRange(
+              color:  Theme.of(context).colorScheme.primary,
+              startWidth: 32,
+              endWidth: 32,
               startValue:0,
               endValue: pointerValue)],
           showTicks: false,

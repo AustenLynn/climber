@@ -9,9 +9,12 @@ class TimerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ElevatedButton(
     onPressed: onClicked,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Theme.of(context).colorScheme.primary
+    ),
     child: const Text(
       "Start timer",
-      style: TextStyle(),
+      style: TextStyle(color: Color(0xFF5c6467)),
     ),
   );
 }
