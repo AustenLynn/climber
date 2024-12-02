@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 ThemeData lightMode = ThemeData(
     brightness: Brightness.light,
-    textTheme: TextTheme(
+    textTheme: const TextTheme(
     headlineLarge: TextStyle(fontSize: 72, fontWeight: FontWeight.bold, color: Color(0xFF5c6467)),
 
       bodySmall: TextStyle(fontSize: 18, color: Color(0xFF5c6467) )
@@ -15,7 +15,7 @@ ThemeData lightMode = ThemeData(
         primary: Color(0xFF2b95c6),
         surface: Color(0xffcbeaef),
         secondary: Color(0xFF166999),
-        tertiary: Color(0x4dcbeaef),
+        tertiary: Color(0xffADCCD1),
     )
 );
 ThemeData darkMode = ThemeData(

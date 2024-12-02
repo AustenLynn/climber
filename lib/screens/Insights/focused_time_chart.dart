@@ -1,9 +1,146 @@
+import 'dart:core';
+
+import 'package:climber/Dao/database.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../Dao/session.dart';
 
 
-class FocusedTimeChart extends StatelessWidget {
-  const FocusedTimeChart({super.key});
+class FocusedTimeChart extends StatefulWidget {
+  final AppDatabase database;
+  final int selectedIndex;
+
+
+  const FocusedTimeChart({super.key, required this.selectedIndex, required this.database});
+
+  @override
+  State<FocusedTimeChart> createState() => _FocusedTimeChartState();
+}
+
+class _FocusedTimeChartState extends State<FocusedTimeChart> {
+
+  List<BarChartGroupData> _barGroups = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChartData();
+  }
+  @override
+  void didUpdateWidget(covariant FocusedTimeChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      _loadChartData();
+    }
+  }
+  Future<List<Session>> getSessionsForToday(AppDatabase database) async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59).millisecondsSinceEpoch;
+    return database.sessionDao.findSessionsInRange(startOfDay, endOfDay);
+  }
+
+  Future<List<Session>> getSessionsForWeek(AppDatabase database) async {
+    final now = DateTime.now();
+    final startOfWeek = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1)); // Monday
+    final endOfWeek = startOfWeek.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+    final startOfWeekMillis = startOfWeek.millisecondsSinceEpoch;
+    final endOfWeekMillis = endOfWeek.millisecondsSinceEpoch;
+    return database.sessionDao.findSessionsInRange(startOfWeekMillis, endOfWeekMillis);
+  }
+
+  Future<List<Session>> getSessionsForMonth(AppDatabase database) async {
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    final endOfMonth = DateTime(now.year, now.month + 1, 1).subtract(const Duration(milliseconds: 1)); // Last day of the month
+    final startOfMonthMillis = startOfMonth.millisecondsSinceEpoch;
+    final endOfMonthMillis = endOfMonth.millisecondsSinceEpoch;
+    return database.sessionDao.findSessionsInRange(startOfMonthMillis, endOfMonthMillis);
+  }
+
+  Future<List<Session>> getSessionsForYear(AppDatabase database) async {
+    final now = DateTime.now();
+    final startOfYear = DateTime(now.year, 1, 1);
+    final endOfYear = DateTime(now.year + 1, 1, 1).subtract(const Duration(milliseconds: 1)); // Dec 31, 23:59:59
+    final startOfYearMillis = startOfYear.millisecondsSinceEpoch;
+    final endOfYearMillis = endOfYear.millisecondsSinceEpoch;
+    return database.sessionDao.findSessionsInRange(startOfYearMillis, endOfYearMillis);
+  }
+
+
+  Future<void> _loadChartData() async {
+    Map<int, Function> periodForChart = {
+      0: getSessionsForToday,
+      1: getSessionsForWeek,
+      2: getSessionsForMonth,
+      3: getSessionsForYear,
+    };
+    final sessionList = await periodForChart[widget.selectedIndex]!(widget.database);
+    final chartData = _formatSessionsData(sessionList);
+    setState(() {
+      _barGroups = chartData;
+    });
+  }
+
+  List<BarChartGroupData> _formatSessionsData(List<Session> sessionList) {
+    debugPrint('Sessions found:');
+    for (final session in sessionList) {
+      debugPrint(
+          'Session ID: ${session.id}, Duration: ${session.minutes}, Time: ${session.dateTimeMillis}');
+    }
+
+    int groupCount = 24;
+    switch (widget.selectedIndex) {
+      case 1:
+        groupCount = 7;
+        break;
+      case 2:
+        groupCount = 30;
+        break;
+      case 3:
+        groupCount = 12;
+        break;
+    }
+
+    final Map<int, double> durations = {for (var i = 0; i < groupCount; i++) i: 0.0};
+
+    for (final session in sessionList) {
+      final sessionDate = DateTime.fromMillisecondsSinceEpoch(session.dateTimeMillis);
+      int groupIndex;
+
+      if (widget.selectedIndex == 0) {
+        // Group by hour (0-23)
+        groupIndex = sessionDate.hour;
+      } else if (widget.selectedIndex == 1) {
+        // Group by day of the week (0-6, Monday is 0)
+        groupIndex = sessionDate.weekday - 1; // Convert to 0-based index
+      } else if (widget.selectedIndex == 2) {
+        // Group by day of the month (1-30)
+        groupIndex = sessionDate.day - 1; // Convert to 0-based index
+      } else {
+        // Group by month (0-11)
+        groupIndex = sessionDate.month - 1; // Convert to 0-based index
+      }
+
+      durations[groupIndex] = (durations[groupIndex] ?? 0) + session.minutes;
+    }
+
+    // Create BarChartGroupData from the durations
+    return durations.entries.map((entry) {
+      final index = entry.key;
+      final durationInMinutes = entry.value;
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: durationInMinutes,
+            color: Colors.blue,
+          ),
+        ],
+      );
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,380 +149,43 @@ class FocusedTimeChart extends StatelessWidget {
       child: Container(
         child: BarChart(
           BarChartData(
-            barGroups: [
-              BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 3)]),
-            ]
+            barGroups: _barGroups,
+            gridData: FlGridData(show: false),
+            titlesData: FlTitlesData(
+                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: _buildBottomAxisTitles(widget.selectedIndex),
+            ),
           ),
         ),
       ),
     );
   }
-}
 
-/*
-final Duration animDuration = const Duration(milliseconds: 250);
-
-int touchedIndex = -1;
-
-bool isPlaying = false;
-
-@override
-Widget build(BuildContext context) {
-  return AspectRatio(
-    aspectRatio: 1,
-    child: Stack(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const Text(
-                'Insights',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+  AxisTitles _buildBottomAxisTitles(int selectedIndex) {
+    return AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    if (selectedIndex == 3 || selectedIndex == 1) return Text('${value.toInt() + 1}');
+                    if (value % 6 != 0 ) {return const SizedBox.shrink();}
+                    if (selectedIndex == 0 ){
+                      return Text(
+                        '${value.toInt()}:00',
+                      );
+                    }
+                    if (selectedIndex == 2){
+                      return Text(
+                        '${value.toInt()}',
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
-              ),
-              const SizedBox(
-                height: 4,
-              ),
-              Text(
-                'Focused Time Distribution',
-                style: TextStyle(
-                  //color: AppColors.contentColorGreen.darken(),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 38,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: BarChart(
-                    isPlaying ? randomData() : mainBarData(),
-                    duration: animDuration,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              icon: Icon(
-                isPlaying ? Icons.pause : Icons.play_arrow,
-                //color: AppColors.contentColorGreen,
-              ),
-              onPressed: () {
-                setState(() {
-                  isPlaying = !isPlaying;
-                  if (isPlaying) {
-                    refreshState();
-                  }
-                });
-              },
-            ),
-          ),
-        )
-      ],
-    ),
-  );
-}
-
-BarChartGroupData makeGroupData(
-    int x,
-    double y, {
-      bool isTouched = false,
-      Color? barColor,
-      double width = 22,
-      List<int> showTooltips = const [],
-    }) {
-  //barColor ??= widget.barColor;
-  return BarChartGroupData(
-    x: x,
-    barRods: [
-      BarChartRodData(
-        toY: isTouched ? y + 1 : y,
-        //color: isTouched ? widget.touchedBarColor : barColor,
-        width: width,
-        borderSide: isTouched
-            ? BorderSide(/*color: widget.touchedBarColor.darken(80)*/)
-            : const BorderSide(color: Colors.white, width: 0),
-        backDrawRodData: BackgroundBarChartRodData(
-          show: true,
-          toY: 20,
-          //color: widget.barBackgroundColor,
-        ),
-      ),
-    ],
-    showingTooltipIndicators: showTooltips,
-  );
-}
-
-List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
-  switch (i) {
-    case 0:
-      return makeGroupData(0, 5, isTouched: i == touchedIndex);
-    case 1:
-      return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
-    case 2:
-      return makeGroupData(2, 5, isTouched: i == touchedIndex);
-    case 3:
-      return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
-    case 4:
-      return makeGroupData(4, 9, isTouched: i == touchedIndex);
-    case 5:
-      return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
-    case 6:
-      return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
-    default:
-      return throw Error();
-  }
-});
-
-BarChartData mainBarData() {
-  return BarChartData(
-    barTouchData: BarTouchData(
-      touchTooltipData: BarTouchTooltipData(
-        getTooltipColor: (_) => Colors.blueGrey,
-        tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-        tooltipMargin: -10,
-        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-          String weekDay;
-          switch (group.x) {
-            case 0:
-              weekDay = 'Monday';
-              break;
-            case 1:
-              weekDay = 'Tuesday';
-              break;
-            case 2:
-              weekDay = 'Wednesday';
-              break;
-            case 3:
-              weekDay = 'Thursday';
-              break;
-            case 4:
-              weekDay = 'Friday';
-              break;
-            case 5:
-              weekDay = 'Saturday';
-              break;
-            case 6:
-              weekDay = 'Sunday';
-              break;
-            default:
-              throw Error();
-          }
-          return BarTooltipItem(
-            '$weekDay\n',
-            const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-            children: <TextSpan>[
-              TextSpan(
-                text: (rod.toY - 1).toString(),
-                style: const TextStyle(
-                  color: Colors.white, //widget.touchedBarColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-      touchCallback: (FlTouchEvent event, barTouchResponse) {
-        setState(() {
-          if (!event.isInterestedForInteractions ||
-              barTouchResponse == null ||
-              barTouchResponse.spot == null) {
-            touchedIndex = -1;
-            return;
-          }
-          touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
-        });
-      },
-    ),
-    titlesData: FlTitlesData(
-      show: true,
-      rightTitles: const AxisTitles(
-        sideTitles: SideTitles(showTitles: false),
-      ),
-      topTitles: const AxisTitles(
-        sideTitles: SideTitles(showTitles: false),
-      ),
-      bottomTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          getTitlesWidget: getTitles,
-          reservedSize: 38,
-        ),
-      ),
-      leftTitles: const AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false,
-        ),
-      ),
-    ),
-    borderData: FlBorderData(
-      show: false,
-    ),
-    barGroups: showingGroups(),
-    gridData: const FlGridData(show: false),
-  );
-}
-
-Widget getTitles(double value, TitleMeta meta) {
-  const style = TextStyle(
-    color: Colors.white,
-    fontWeight: FontWeight.bold,
-    fontSize: 14,
-  );
-  Widget text;
-  switch (value.toInt()) {
-    case 0:
-      text = const Text('M', style: style);
-      break;
-    case 1:
-      text = const Text('T', style: style);
-      break;
-    case 2:
-      text = const Text('W', style: style);
-      break;
-    case 3:
-      text = const Text('T', style: style);
-      break;
-    case 4:
-      text = const Text('F', style: style);
-      break;
-    case 5:
-      text = const Text('S', style: style);
-      break;
-    case 6:
-      text = const Text('S', style: style);
-      break;
-    default:
-      text = const Text('', style: style);
-      break;
-  }
-  return SideTitleWidget(
-    axisSide: meta.axisSide,
-    space: 16,
-    child: text,
-  );
-}
-
-BarChartData randomData() {
-  return BarChartData(
-    barTouchData: BarTouchData(
-      enabled: false,
-    ),
-    titlesData: FlTitlesData(
-      show: true,
-      bottomTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          getTitlesWidget: getTitles,
-          reservedSize: 38,
-        ),
-      ),
-      leftTitles: const AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false,
-        ),
-      ),
-      topTitles: const AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false,
-        ),
-      ),
-      rightTitles: const AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false,
-        ),
-      ),
-    ),
-    borderData: FlBorderData(
-      show: false,
-    ),
-    barGroups: List.generate(7, (i) {
-      switch (i) {
-        case 0:
-          return makeGroupData(
-            0,
-            Random().nextInt(15).toDouble() + 6,
-            //barColor: widget.availableColors[
-            //Random().nextInt(widget.availableColors.length)],
-          );
-        case 1:
-          return makeGroupData(
-            1,
-            Random().nextInt(15).toDouble() + 6,
-            //barColor: widget.availableColors[
-            //Random().nextInt(widget.availableColors.length)],
-          );
-        case 2:
-          return makeGroupData(
-            2,
-            Random().nextInt(15).toDouble() + 6,
-            //barColor: widget.availableColors[
-            //Random().nextInt(widget.availableColors.length)],
-          );
-        case 3:
-          return makeGroupData(
-            3,
-            Random().nextInt(15).toDouble() + 6,
-            //barColor: widget.availableColors[
-            //Random().nextInt(widget.availableColors.length)],
-          );
-        case 4:
-          return makeGroupData(
-            4,
-            Random().nextInt(15).toDouble() + 6,
-            //barColor: widget.availableColors[
-            //Random().nextInt(widget.availableColors.length)],
-          );
-        case 5:
-          return makeGroupData(
-            5,
-            Random().nextInt(15).toDouble() + 6,
-            //barColor: widget.availableColors[
-            //Random().nextInt(widget.availableColors.length)],
-          );
-        case 6:
-          return makeGroupData(
-            6,
-            Random().nextInt(15).toDouble() + 6,
-            //barColor: widget.availableColors[
-            //Random().nextInt(widget.availableColors.length)],
-          );
-        default:
-          return throw Error();
-      }
-    }),
-    gridData: const FlGridData(show: false),
-  );
-}
-
-Future<dynamic> refreshState() async {
-  setState(() {});
-  await Future<dynamic>.delayed(
-    animDuration + const Duration(milliseconds: 50),
-  );
-  if (isPlaying) {
-    await refreshState();
+              );
   }
 }
-*/
+
+
+
+

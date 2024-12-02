@@ -1,12 +1,13 @@
-import 'dart:async';
-import 'dart:math';
 
+
+import 'package:climber/Dao/database.dart';
 import 'package:flutter/material.dart';
 import 'custom_button_bar.dart';
 import 'focused_time_chart.dart';
 class InsightsScreen extends StatefulWidget {
-  InsightsScreen({super.key});
 
+  final AppDatabase database;
+  const InsightsScreen({super.key, required this.database});
 
   @override
   State<StatefulWidget> createState() => InsightsScreenState();
@@ -16,7 +17,6 @@ class InsightsScreenState extends State<InsightsScreen> {
 
   int selectedIndex = 0;
   final List<String> tabs = ['Day', 'Week', 'Month', 'Year'];
-
 
   void onTabSelected(int index) {
     setState(() {
@@ -30,10 +30,13 @@ class InsightsScreenState extends State<InsightsScreen> {
    return Container(
       padding: const EdgeInsets.all(24),
      child: Column(
+       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+       crossAxisAlignment: CrossAxisAlignment.start,
        children: [
         CustomTabBar(onTap: onTabSelected, tabs: tabs, selectedIndex: selectedIndex),
-         const Text("FocusedTime", style: TextStyle( fontSize: 16),),
-         FocusedTimeChart(),
+         const Text("Focused Time Distribution", style: TextStyle(fontSize: 16),
+         ),
+         FocusedTimeChart(selectedIndex: selectedIndex, database: widget.database),
        ],
      ),
    );

@@ -141,6 +141,17 @@ class _$SessionDao extends SessionDao {
   }
 
   @override
+  Future<List<Session>> findSessionsInRange(
+    int startMillis,
+    int endMillis,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM Session    WHERE dateTimeMillis >= ?1 AND dateTimeMillis <= ?2',
+        mapper: (Map<String, Object?> row) => Session(row['id'] as int, row['minutes'] as int, row['dateTimeMillis'] as int),
+        arguments: [startMillis, endMillis]);
+  }
+
+  @override
   Stream<List<int>> findAllSessionMinutes() {
     return _queryAdapter.queryListStream('SELECT minutes FROM Session',
         mapper: (Map<String, Object?> row) => row.values.first as int,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomTabBar extends StatelessWidget {
-  final List<String> tabs; // List of tab labels
-  final int selectedIndex; // Currently selected tab index
-  final Function(int) onTap; // Callback for tab taps
+  final List<String> tabs;
+  final int selectedIndex;
+  final Function(int) onTap;
 
   const CustomTabBar({
     super.key,
@@ -15,8 +15,10 @@ class CustomTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color:Theme.of(context).colorScheme.tertiary, // Bar background color
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+          color:Theme.of(context).colorScheme.tertiary,
+          borderRadius: BorderRadius.circular(8)
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(tabs.length, (index) {
@@ -28,7 +30,7 @@ class CustomTabBar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedIndex == index
-                      ? Colors.blue // Highlight selected tab
+                      ? Theme.of(context).colorScheme.primary// Highlight selected tab
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8), // Smooth corners
                 ),
@@ -38,8 +40,8 @@ class CustomTabBar extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: selectedIndex == index
-                        ? Colors.white // Selected text color
-                        : Colors.blue, // Unselected text color
+                        ? Theme.of(context).colorScheme.surface // Selected text color
+                        :Theme.of(context).colorScheme.primary , // Unselected text color
                   ),
                 ),
               ),

@@ -8,6 +8,12 @@ abstract class SessionDao {
   @Query('SELECT * FROM Session')
   Future<List<Session>> findAllSessions();
 
+  @Query('''
+  SELECT * FROM Session 
+  WHERE dateTimeMillis >= :startMillis AND dateTimeMillis <= :endMillis
+''')
+  Future<List<Session>> findSessionsInRange(int startMillis, int endMillis);
+
   @Query('SELECT minutes FROM Session')
   Stream<List<int>> findAllSessionMinutes();
 
