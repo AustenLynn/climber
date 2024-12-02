@@ -20,6 +20,7 @@ class FocusedTimeChart extends StatefulWidget {
 class _FocusedTimeChartState extends State<FocusedTimeChart> {
 
   List<BarChartGroupData> _barGroups = [];
+  int totalTimeFocused = 0;
 
   @override
   void initState() {
@@ -84,6 +85,7 @@ class _FocusedTimeChartState extends State<FocusedTimeChart> {
   }
 
   List<BarChartGroupData> _formatSessionsData(List<Session> sessionList) {
+    totalTimeFocused = 0;
     debugPrint('Sessions found:');
     for (final session in sessionList) {
       debugPrint(
@@ -124,9 +126,10 @@ class _FocusedTimeChartState extends State<FocusedTimeChart> {
       }
 
       durations[groupIndex] = (durations[groupIndex] ?? 0) + session.minutes;
+      totalTimeFocused += session.minutes;
     }
 
-    // Create BarChartGroupData from the durations
+    final maxDuration = durations.values.isNotEmpty ? durations.values.reduce((a, b) => a > b ? a : b) : 0.0;
     return durations.entries.map((entry) {
       final index = entry.key;
       final durationInMinutes = entry.value;
@@ -134,6 +137,11 @@ class _FocusedTimeChartState extends State<FocusedTimeChart> {
         x: index,
         barRods: [
           BarChartRodData(
+            backDrawRodData: BackgroundBarChartRodData(
+              toY: maxDuration,
+              color: Theme.of(context).colorScheme.tertiary,
+              show: true
+            ),
             toY: durationInMinutes,
             color: Colors.blue,
           ),
@@ -144,21 +152,42 @@ class _FocusedTimeChartState extends State<FocusedTimeChart> {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Container(
-        child: BarChart(
-          BarChartData(
-            barGroups: _barGroups,
-            gridData: FlGridData(show: false),
-            titlesData: FlTitlesData(
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                bottomTitles: _buildBottomAxisTitles(widget.selectedIndex),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(
+          TextSpan(
+            text: "Total Time Focused: ",
+      children: [
+        TextSpan(
+          text: totalTimeFocused.toString(),
+          style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.bold),
+        ),
+        TextSpan(
+            text: " Min",
+        ),
+      ]
+    ),
+        ),
+        AspectRatio(
+          aspectRatio: 1,
+          child: Container(
+            padding: EdgeInsets.only(top: 24),
+            child: BarChart(
+              BarChartData(
+                barGroups: _barGroups,
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    bottomTitles: _buildBottomAxisTitles(widget.selectedIndex),
+                ),
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -167,16 +196,17 @@ class _FocusedTimeChartState extends State<FocusedTimeChart> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: (value, meta) {
+                    int newValue = (value.toInt())+1;
                     if (selectedIndex == 3 || selectedIndex == 1) return Text('${value.toInt() + 1}');
-                    if (value % 6 != 0 ) {return const SizedBox.shrink();}
+                    if (newValue % 6 != 0 ) {return const SizedBox.shrink();}
                     if (selectedIndex == 0 ){
                       return Text(
-                        '${value.toInt()}:00',
+                        '${newValue}:00',
                       );
                     }
                     if (selectedIndex == 2){
                       return Text(
-                        '${value.toInt()}',
+                        '${newValue}',
                       );
                     }
                     return const SizedBox.shrink();

@@ -34,7 +34,7 @@ class InsightsScreenState extends State<InsightsScreen> {
        crossAxisAlignment: CrossAxisAlignment.start,
        children: [
         CustomTabBar(onTap: onTabSelected, tabs: tabs, selectedIndex: selectedIndex),
-         const Text("Focused Time Distribution", style: TextStyle(fontSize: 16),
+         Text("Focused Time Distribution", style: Theme.of(context).textTheme.headlineMedium,
          ),
          FocusedTimeChart(selectedIndex: selectedIndex, database: widget.database),
        ],

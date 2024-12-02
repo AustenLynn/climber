@@ -5,8 +5,9 @@ ThemeData lightMode = ThemeData(
     brightness: Brightness.light,
     textTheme: const TextTheme(
     headlineLarge: TextStyle(fontSize: 72, fontWeight: FontWeight.bold, color: Color(0xFF5c6467)),
+        headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF5c6467)),
 
-      bodySmall: TextStyle(fontSize: 18, color: Color(0xFF5c6467) )
+      bodySmall: TextStyle(fontSize: 18, color: Color(0xFF5c6467)),
 
 
 
