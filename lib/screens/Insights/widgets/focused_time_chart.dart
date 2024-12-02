@@ -3,7 +3,7 @@ import 'dart:core';
 import 'package:climber/Dao/database.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../Dao/session.dart';
+import '../../../Dao/session.dart';
 
 
 class FocusedTimeChart extends StatefulWidget {

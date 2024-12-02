@@ -42,24 +42,35 @@ class _ScreenManagerState extends State<ScreenManager> {
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
-  Widget _buildBottomNavigationBar(){
-    return BottomNavigationBar(
-      onTap: _changeIndex,
-      currentIndex: _currentIndex,
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.av_timer),
-          label: 'Timer',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.checklist),
-          label: 'To-Do',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.insights),
-          label: 'Insights',
-        ),
-      ],
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3), // Shadow color
+            blurRadius: 10, // Blur radius for the shadow
+            offset: Offset(0, -5), // Offset the shadow upwards
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        onTap: _changeIndex,
+        currentIndex: _currentIndex,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.av_timer),
+            label: 'Timer',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.checklist),
+            label: 'To-Do',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.insights),
+            label: 'Insights',
+          ),
+        ],
+      ),
     );
   }
 

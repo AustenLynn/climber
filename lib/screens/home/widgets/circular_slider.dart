@@ -28,8 +28,8 @@ class CircularSlider extends StatelessWidget {
             MarkerPointer(
               value: pointerValue,
               enableDragging: true,
-              markerWidth: 30,
-              markerHeight: 30,
+              markerWidth: 50,
+              markerHeight: 50,
               color: Theme.of(context).colorScheme.primary,
               markerType: MarkerType.circle,
               onValueChanged: onChanged,

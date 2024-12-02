@@ -2,8 +2,8 @@
 
 import 'package:climber/Dao/database.dart';
 import 'package:flutter/material.dart';
-import 'custom_button_bar.dart';
-import 'focused_time_chart.dart';
+import 'widgets/custom_button_bar.dart';
+import 'widgets/focused_time_chart.dart';
 class InsightsScreen extends StatefulWidget {
 
   final AppDatabase database;
@@ -28,7 +28,7 @@ class InsightsScreenState extends State<InsightsScreen> {
   @override
  Widget build(BuildContext context){
    return Container(
-      padding: const EdgeInsets.all(24),
+     padding: const EdgeInsets.all(24),
      child: Column(
        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
        crossAxisAlignment: CrossAxisAlignment.start,
