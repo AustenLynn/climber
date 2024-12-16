@@ -49,3 +49,12 @@ With this data, you can reflect on your habits and make adjustments to optimize 
 
 ## Why Climber?
 Life is a climb, and Climber is here to guide you up the mountain of your goals. With simple tools that work together seamlessly, Climber helps you stay productive, track your focus, and achieve what truly matters. Start climbing today!
+
+
+<details>
+<summary>Click to reveal</summary>
+
+Hidden text goes here. It will be visible when the user clicks "Click to reveal."
+
+</details>
+
